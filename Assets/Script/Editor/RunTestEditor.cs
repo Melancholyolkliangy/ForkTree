@@ -12,10 +12,7 @@ namespace Script.Editor
 			RunTest myTarget = (RunTest)target;
 			if (GUILayout.Button("Add New GameObject"))
 			{
-				var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
-				go.name = $"RunTest_({myTarget.toAddPosition})";
-				go.transform.position = myTarget.toAddPosition;
-				myTarget.forkTree.Insert(go.transform);
+				myTarget.objects.Add(BaseObjectFactory.CreateBaseObject(myTarget.toAddPosition, myTarget.forkTree));
 				myTarget.toAddPosition += Vector2.one * 1.2f;
 			}
 
@@ -26,8 +23,8 @@ namespace Script.Editor
 				{
 					var tuple = collisionList[i];
 					Color color = Random.ColorHSV();
-					tuple.Item1.GetComponent<MeshRenderer>().material.color = color;
-					tuple.Item2.GetComponent<MeshRenderer>().material.color = color;
+					tuple.Item1.Transform.GetComponent<MeshRenderer>().material.color = color;
+					tuple.Item2.Transform.GetComponent<MeshRenderer>().material.color = color;
 				}
 			}
 			if (GUILayout.Button("Modified Boxes"))

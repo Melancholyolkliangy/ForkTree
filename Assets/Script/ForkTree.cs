@@ -1,6 +1,14 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+public class MyGameObject
+{
+	public Vector3 speed;
+	public Transform Transform;
+	public float mass;
+	public Bounds bounds => Transform.GetComponent<BoxCollider>().bounds;
+	public Vector3 compensation;
+}
 public class ForkTree
 {
 	public bool IsDivided { get;private set; }
@@ -10,7 +18,7 @@ public class ForkTree
 	public ForkTree SouthWest { get;private set; }
 	public int Capacity { get; private set; } = 10;
 	public Bounds Bounds { get; private set; }
-	private List<Transform> Transforms = new List<Transform>();
+	private List<MyGameObject> Transforms = new List<MyGameObject>();
 
 	public ForkTree(Bounds bounds,int capacity = 10)
 	{
@@ -28,15 +36,15 @@ public class ForkTree
 		}
 	}
 
-	List<Transform> GetModifiedObject()
+	List<MyGameObject> GetModifiedObject()
 	{
-		List<Transform> result = new List<Transform>();
+		List<MyGameObject> result = new List<MyGameObject>();
 		if (!IsDivided)
 		{
 			for (int i = Transforms.Count - 1; i >= 0; i--)
 			{
 				var transform = Transforms[i];
-				if (!Bounds.Contains(transform.position))
+				if (!Bounds.Contains(transform.Transform.position))
 				{
 					Transforms.Remove(transform);
 					result.Add(transform);
@@ -52,9 +60,9 @@ public class ForkTree
 		}
 		return result;
 	}
-	public List<(Transform, Transform)> GetCollisionList()
+	public List<(MyGameObject, MyGameObject)> GetCollisionList()
 	{
-		List<(Transform, Transform)> collisions = new List<(Transform, Transform)>();
+		List<(MyGameObject, MyGameObject)> collisions = new List<(MyGameObject, MyGameObject)>();
 		if (!IsDivided)
 		{
 			for (int i = 0; i < Transforms.Count; i++)
@@ -75,14 +83,14 @@ public class ForkTree
 		}
 		return collisions;
 	}
-	bool CheckCollision(Transform t1,Transform t2)
+	bool CheckCollision(MyGameObject t1,MyGameObject t2)
 	{
-		UnityEngine.Bounds b1 = t1.GetComponent<BoxCollider>().bounds;
-		UnityEngine.Bounds b2 = t2.GetComponent<BoxCollider>().bounds;
+		Bounds b1 = t1.bounds;
+		Bounds b2 = t2.bounds;
 		return b1.Intersects(b2);
 	}
 	//向四叉树插入新物体
-	public void Insert(Transform transform)
+	public void Insert(MyGameObject transform)
 	{
 		if (IsDivided)
 		{
@@ -117,17 +125,17 @@ public class ForkTree
 		Transforms = null;
 	}
 
-	private void InsertToChildren(Transform transform)
+	private void InsertToChildren(MyGameObject transform)
 	{
-		if (NorthEast.Bounds.Contains(transform.position))
+		if (NorthEast.Bounds.Contains(transform.Transform.position))
 		{
 			NorthEast.Insert(transform);
 		}
-		else if (NorthWest.Bounds.Contains(transform.position))
+		else if (NorthWest.Bounds.Contains(transform.Transform.position))
 		{
 			NorthWest.Insert(transform);
 		}
-		else if (SouthWest.Bounds.Contains(transform.position))
+		else if (SouthWest.Bounds.Contains(transform.Transform.position))
 		{
 			SouthWest.Insert(transform);
 		}
